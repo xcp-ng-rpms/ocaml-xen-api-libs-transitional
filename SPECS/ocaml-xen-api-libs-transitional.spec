@@ -1,13 +1,13 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.4.0
+Version:        2.7.0
 Release:        1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 Source0:        https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v%{version}&format=tar.gz&prefix=xen-api-libs-transitional-%{version}#/xen-api-libs-transitional-%{version}.tar.gz
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.4.0&format=tar.gz&prefix=xen-api-libs-transitional-2.4.0#/xen-api-libs-transitional-2.4.0.tar.gz) = 13b952f7b871597e906f5ece839c5ad79501b95a
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.7.0&format=tar.gz&prefix=xen-api-libs-transitional-2.7.0#/xen-api-libs-transitional-2.7.0.tar.gz) = d7dcb6518f396176bd3ac396537af35929009932
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
 BuildRequires:  ocaml-camlp4-devel
@@ -195,6 +195,17 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Wed Jul 18 2018 Christian Lindig <christian.lindig@citrix.com> - 2.7.0-1
+- CA-291012 Added better printing of xml exc
+
+* Thu May 24 2018 Christian Lindig <christian.lindig@citrix.com> - 2.6.0-1
+- CA-289145: Close socket if error occurs when connecting
+- http-svr: make again safe-string compliant after last PR
+
+* Tue May 01 2018 Christian Lindig <christian.lindig@citrix.com> - 2.5.0-1
+- http-svr: reintroduce really_write, whose behaviour has been fixed 
+  in xapi-stdext-unix 1.2.0
+
 * Mon Apr 09 2018 Christian Lindig <christian.lindig@citrix.com> - 2.4.0-1
 - CA-285840: Make sure stunnel doesn't hang talking to dead hosts
 
