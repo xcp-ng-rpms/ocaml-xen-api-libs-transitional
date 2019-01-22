@@ -1,0 +1,128 @@
+From d06358c15e3b8bb4cad21fb8fb66f40d27b45396 Mon Sep 17 00:00:00 2001
+From: John Else <john.else@gmail.com>
+Date: Sat, 20 Oct 2018 23:00:33 +0100
+Subject: [PATCH 2/4] Add zstd library
+
+As with Gzip, the binary path is currently hardcoded. This path is the
+default install location on CentOS.
+
+(cherry picked from commit 3d64553963a74a59f5ec00c2e5fdcfa68d7f9fd9)
+
+ Conflicts:
+	.travis.yml
+
+Signed-off-by: John Else <john.else@gmail.com>
+---
+ .travis.yml   |  2 +-
+ zstd.opam     | 14 ++++++++++++++
+ zstd/jbuild   |  6 ++++++
+ zstd/zstd.ml  | 20 ++++++++++++++++++++
+ zstd/zstd.mli | 24 ++++++++++++++++++++++++
+ 5 files changed, 65 insertions(+), 1 deletion(-)
+ create mode 100644 zstd.opam
+ create mode 100644 zstd/jbuild
+ create mode 100644 zstd/zstd.ml
+ create mode 100644 zstd/zstd.mli
+
+diff --git a/.travis.yml b/.travis.yml
+index 4207f18..980749f 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -9,7 +9,7 @@ services:
+ env:
+     global:
+         - OCAML_VERSION=4.04.2
+-        - PINS="compression:. gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-libs-transitional:. xenctrlext:. xml-light2:."
++        - PINS="compression:. gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-libs-transitional:. xenctrlext:. xml-light2:. zstd:."
+         - PACKAGE=xapi-libs-transitional
+         - DISTRO="debian-stable"
+     matrix:
+diff --git a/zstd.opam b/zstd.opam
+new file mode 100644
+index 0000000..29a9463
+--- /dev/null
++++ b/zstd.opam
+@@ -0,0 +1,14 @@
++opam-version: "1.2"
++maintainer: "xen-api@lists.xen.org"
++authors: "xen-api@lists.xen.org"
++homepage: "https://xapi-project.github.io/"
++bug-reports: "https://github.com/xapi-project/xen-api-libs-transitional.git"
++dev-repo: "https://github.com/xapi-project/xen-api-libs-transitional.git"
++
++build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
++
++available: [ os = "linux" ]
++depends: [
++  "jbuilder" {build}
++  "compression"
++]
+diff --git a/zstd/jbuild b/zstd/jbuild
+new file mode 100644
+index 0000000..4ab0759
+--- /dev/null
++++ b/zstd/jbuild
+@@ -0,0 +1,6 @@
++(library
++ ((name zstd)
++  (public_name zstd)
++  (libraries
++   (compression))
++ ))
+diff --git a/zstd/zstd.ml b/zstd/zstd.ml
+new file mode 100644
+index 0000000..7bf4c25
+--- /dev/null
++++ b/zstd/zstd.ml
+@@ -0,0 +1,20 @@
++(*
++ * Copyright (C) 2018 Citrix Systems Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; version 2.1 only. with the special
++ * exception on linking described in file LICENSE.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ *)
++
++module Zstd = Compression.Make(struct
++  (** Path to the zstd binary *)
++  let executable = "/usr/bin/zstd"
++end)
++
++include Zstd
+diff --git a/zstd/zstd.mli b/zstd/zstd.mli
+new file mode 100644
+index 0000000..cb3bee3
+--- /dev/null
++++ b/zstd/zstd.mli
+@@ -0,0 +1,24 @@
++(*
++ * Copyright (C) 2018 Citrix Systems Inc.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; version 2.1 only. with the special
++ * exception on linking described in file LICENSE.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU Lesser General Public License for more details.
++ *)
++
++(** Runs a compression process which is fed from a pipe whose entrance is passed to 'f'
++    and whose output is 'ofd' *)
++val compress: Unix.file_descr -> (Unix.file_descr -> unit) -> unit
++
++(** Runs a decompression process which is fed from a pipe whose entrance is passed to 'f'
++    and whose output is 'ofd' *)
++val decompress: Unix.file_descr -> (Unix.file_descr -> 'a) -> 'a
++
++(* Experimental decompressor which is fed from an fd and writes to a pipe *)
++val decompress_passive: Unix.file_descr -> (Unix.file_descr -> 'a) -> 'a
+

@@ -1,0 +1,144 @@
+From 699da39cff16d8b70f518b67950d1f7661a65d27 Mon Sep 17 00:00:00 2001
+From: John Else <john.else@gmail.com>
+Date: Thu, 29 Nov 2018 23:12:24 +0000
+Subject: [PATCH 4/4] Rename generic compression library and module
+
+compression is renamed to xapi-compression
+Compression is renamed to Xapi_compression
+
+(cherry picked from commit 081b8cd5863e1708476cd67a3f6b0547be58a262)
+
+ Conflicts:
+	.travis.yml
+
+Signed-off-by: John Else <john.else@gmail.com>
+---
+ .travis.yml                                                          | 2 +-
+ gzip.opam                                                            | 2 +-
+ gzip/gzip.ml                                                         | 2 +-
+ gzip/jbuild                                                          | 2 +-
+ compression.opam => xapi-compression.opam                            | 0
+ {compression => xapi-compression}/jbuild                             | 4 ++--
+ compression/compression.ml => xapi-compression/xapi_compression.ml   | 0
+ compression/compression.mli => xapi-compression/xapi_compression.mli | 0
+ zstd.opam                                                            | 2 +-
+ zstd/jbuild                                                          | 2 +-
+ zstd/zstd.ml                                                         | 2 +-
+ 11 files changed, 9 insertions(+), 9 deletions(-)
+ rename compression.opam => xapi-compression.opam (100%)
+ rename {compression => xapi-compression}/jbuild (63%)
+ rename compression/compression.ml => xapi-compression/xapi_compression.ml (100%)
+ rename compression/compression.mli => xapi-compression/xapi_compression.mli (100%)
+
+diff --git a/.travis.yml b/.travis.yml
+index 980749f..82b4844 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -9,7 +9,7 @@ services:
+ env:
+     global:
+         - OCAML_VERSION=4.04.2
+-        - PINS="compression:. gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-libs-transitional:. xenctrlext:. xml-light2:. zstd:."
++        - PINS="gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-compression:. xapi-libs-transitional:. xenctrlext:. xml-light2:. zstd:."
+         - PACKAGE=xapi-libs-transitional
+         - DISTRO="debian-stable"
+     matrix:
+diff --git a/gzip.opam b/gzip.opam
+index 29a9463..2625f69 100644
+--- a/gzip.opam
++++ b/gzip.opam
+@@ -10,5 +10,5 @@ build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
+ available: [ os = "linux" ]
+ depends: [
+   "jbuilder" {build}
+-  "compression"
++  "xapi-compression"
+ ]
+diff --git a/gzip/gzip.ml b/gzip/gzip.ml
+index be5f24f..1331a9a 100644
+--- a/gzip/gzip.ml
++++ b/gzip/gzip.ml
+@@ -12,7 +12,7 @@
+  * GNU Lesser General Public License for more details.
+  *)
+ 
+-module Gzip = Compression.Make(struct
++module Gzip = Xapi_compression.Make(struct
+   (** Path to the gzip binary *)
+   let executable = "/bin/gzip"
+ end)
+diff --git a/gzip/jbuild b/gzip/jbuild
+index 9a90461..98afbe5 100644
+--- a/gzip/jbuild
++++ b/gzip/jbuild
+@@ -2,5 +2,5 @@
+  ((name gzip)
+   (public_name gzip)
+   (libraries
+-   (compression))
++   (xapi-compression))
+  ))
+diff --git a/compression.opam b/xapi-compression.opam
+similarity index 100%
+rename from compression.opam
+rename to xapi-compression.opam
+diff --git a/compression/jbuild b/xapi-compression/jbuild
+similarity index 63%
+rename from compression/jbuild
+rename to xapi-compression/jbuild
+index 05d2240..fa67957 100644
+--- a/compression/jbuild
++++ b/xapi-compression/jbuild
+@@ -1,6 +1,6 @@
+ (library
+- ((name compression)
+-  (public_name compression)
++ ((name xapi_compression)
++  (public_name xapi-compression)
+   (libraries
+    (forkexec
+     threads
+diff --git a/compression/compression.ml b/xapi-compression/xapi_compression.ml
+similarity index 100%
+rename from compression/compression.ml
+rename to xapi-compression/xapi_compression.ml
+diff --git a/compression/compression.mli b/xapi-compression/xapi_compression.mli
+similarity index 100%
+rename from compression/compression.mli
+rename to xapi-compression/xapi_compression.mli
+diff --git a/zstd.opam b/zstd.opam
+index 29a9463..2625f69 100644
+--- a/zstd.opam
++++ b/zstd.opam
+@@ -10,5 +10,5 @@ build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
+ available: [ os = "linux" ]
+ depends: [
+   "jbuilder" {build}
+-  "compression"
++  "xapi-compression"
+ ]
+diff --git a/zstd/jbuild b/zstd/jbuild
+index 4ab0759..05c8bef 100644
+--- a/zstd/jbuild
++++ b/zstd/jbuild
+@@ -2,5 +2,5 @@
+  ((name zstd)
+   (public_name zstd)
+   (libraries
+-   (compression))
++   (xapi-compression))
+  ))
+diff --git a/zstd/zstd.ml b/zstd/zstd.ml
+index 7bf4c25..ff42ab8 100644
+--- a/zstd/zstd.ml
++++ b/zstd/zstd.ml
+@@ -12,7 +12,7 @@
+  * GNU Lesser General Public License for more details.
+  *)
+ 
+-module Zstd = Compression.Make(struct
++module Zstd = Xapi_compression.Make(struct
+   (** Path to the zstd binary *)
+   let executable = "/usr/bin/zstd"
+ end)
+

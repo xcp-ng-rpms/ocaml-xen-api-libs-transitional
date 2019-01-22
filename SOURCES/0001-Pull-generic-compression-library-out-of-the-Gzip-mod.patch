@@ -1,0 +1,318 @@
+From 6c4fcb62feaa85e57cef7de84c2a2ee1213461b4 Mon Sep 17 00:00:00 2001
+From: John Else <john.else@gmail.com>
+Date: Wed, 17 Oct 2018 00:17:42 +0100
+Subject: [PATCH 1/4] Pull generic compression library out of the Gzip module
+
+The Gzip interface is unchanged.
+
+(cherry picked from commit 3f881066a1bdd4b52275e49edb57fba0d47c2dc9)
+
+ Conflicts:
+	.travis.yml
+
+Signed-off-by: John Else <john.else@gmail.com>
+---
+ .travis.yml                 |  2 +-
+ compression.opam            | 16 +++++++++
+ compression/compression.ml  | 87 ++++++++++++++++++++++++++++++++++++++++++++
+ compression/compression.mli | 16 +++++++++
+ compression/jbuild          |  9 +++++
+ gzip.opam                   |  4 +--
+ gzip/gzip.ml                | 88 +++------------------------------------------
+ gzip/jbuild                 |  5 +--
+ 8 files changed, 136 insertions(+), 91 deletions(-)
+ create mode 100644 compression.opam
+ create mode 100644 compression/compression.ml
+ create mode 100644 compression/compression.mli
+ create mode 100644 compression/jbuild
+
+diff --git a/.travis.yml b/.travis.yml
+index ee0e38b..4207f18 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -9,7 +9,7 @@ services:
+ env:
+     global:
+         - OCAML_VERSION=4.04.2
+-        - PINS="gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-libs-transitional:. xenctrlext:. xml-light2:."
++        - PINS="compression:. gzip:. http-svr:. pciutil:. sexpr:. sha1:. stunnel:. uuid:. xapi-libs-transitional:. xenctrlext:. xml-light2:."
+         - PACKAGE=xapi-libs-transitional
+         - DISTRO="debian-stable"
+     matrix:
+diff --git a/compression.opam b/compression.opam
+new file mode 100644
+index 0000000..a4d07e9
+--- /dev/null
++++ b/compression.opam
+@@ -0,0 +1,16 @@
++opam-version: "1.2"
++maintainer: "xen-api@lists.xen.org"
++authors: "xen-api@lists.xen.org"
++homepage: "https://xapi-project.github.io/"
++bug-reports: "https://github.com/xapi-project/xen-api-libs-transitional.git"
++dev-repo: "https://github.com/xapi-project/xen-api-libs-transitional.git"
++
++build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
++
++available: [ os = "linux" ]
++depends: [
++  "jbuilder" {build}
++  "forkexec"
++  "xapi-stdext-pervasives"
++  "xapi-stdext-unix"
++]
+diff --git a/compression/compression.ml b/compression/compression.ml
+new file mode 100644
+index 0000000..b38aa05
+--- /dev/null
++++ b/compression/compression.ml
+@@ -0,0 +1,87 @@
++module type ALGORITHM = sig
++  val executable : string
++end
++
++open Xapi_stdext_pervasives.Pervasiveext
++
++module Make(Algorithm : ALGORITHM) = struct
++  (** Helper function to prevent double-closes of file descriptors *)
++  let close to_close fd =
++    if List.mem fd !to_close then Unix.close fd;
++    to_close := List.filter (fun x -> fd <> x) !to_close
++
++  type zcat_mode = Compress | Decompress
++
++  type input_type =
++    | Active  (** we provide a function which writes into the compressor and a fd output *)
++    | Passive (** we provide an fd input and a function which reads from the compressor *)
++
++  (* start cmd with lowest priority so that it doesn't
++     use up all cpu resources in dom0
++  *)
++  let lower_priority cmd args =
++    let ionice="/usr/bin/ionice" in
++    let ionice_args=["-c";"3"] in (*io idle*)
++    let nice="/bin/nice" in
++    let nice_args=["-n";"19"] in (*lowest priority*)
++    let extra_args=nice_args@[ionice]@ionice_args in
++    let new_cmd=nice in
++    let new_args=extra_args@[cmd]@args in
++    (new_cmd,new_args)
++
++  (** Runs a zcat process which is either:
++      i) a compressor; or (ii) a decompressor
++      and which has either
++      i) an active input (ie a function and a pipe) + passive output (fd); or
++      ii) a passive input (fd) + active output (ie a function and a pipe)
++  *)
++  let go (mode: zcat_mode) (input: input_type) fd f =
++    let zcat_out, zcat_in = Unix.pipe() in
++
++    let to_close = ref [ zcat_in; zcat_out ] in
++    let close = close to_close in
++
++    finally
++      (fun () ->
++         let args = if mode = Compress then [] else ["--decompress"] @ [ "--stdout"; "--force" ] in
++
++         let stdin, stdout, close_now, close_later = match input with
++           | Active ->
++             Some zcat_out,                              (* input comes from the pipe+fn *)
++             Some fd,                                    (* supplied fd is written to *)
++             zcat_out,                                   (* we close this now *)
++             zcat_in                                     (* close this before waitpid *)
++           | Passive ->
++             Some fd,                                    (* supplied fd is read from *)
++             Some zcat_in,                               (* output goes into the pipe+fn *)
++             zcat_in,                                    (* we close this now *)
++             zcat_out in                                 (* close this before waitpid *)
++         let (executable,args)=lower_priority Algorithm.executable args in
++         let pid = Forkhelpers.safe_close_and_exec stdin stdout None [] executable args in
++         close close_now;
++         finally
++           (fun () ->
++              f close_later
++           )
++           (fun () ->
++              let failwith_error s =
++                let mode = if mode = Compress then "Compression" else "Decompression" in
++                let msg = Printf.sprintf "%s via zcat failed: %s" mode s in
++                Printf.eprintf "%s" msg;
++                failwith msg
++              in
++              close close_later;
++              let open Xapi_stdext_unix in
++              match snd (Forkhelpers.waitpid pid) with
++              | Unix.WEXITED 0 -> ();
++              | Unix.WEXITED i -> failwith_error (Printf.sprintf "exit code %d" i)
++              | Unix.WSIGNALED i -> failwith_error (Printf.sprintf "killed by signal: %s" (Unixext.string_of_signal i))
++              | Unix.WSTOPPED i -> failwith_error (Printf.sprintf "stopped by signal: %s" (Unixext.string_of_signal i))
++           )
++      ) (fun () -> List.iter close !to_close)
++
++  let compress fd f = go Compress Active fd f
++  let decompress fd f = go Decompress Active fd f
++
++  let decompress_passive fd f = go Decompress Passive fd f
++end
+diff --git a/compression/compression.mli b/compression/compression.mli
+new file mode 100644
+index 0000000..006812b
+--- /dev/null
++++ b/compression/compression.mli
+@@ -0,0 +1,16 @@
++module type ALGORITHM = sig
++  val executable : string
++end
++
++module Make : functor (Algorithm : ALGORITHM) -> sig
++  (** Runs a compression process which is fed from a pipe whose entrance is passed to 'f'
++      and whose output is 'ofd' *)
++  val compress: Unix.file_descr -> (Unix.file_descr -> unit) -> unit
++
++  (** Runs a decompression process which is fed from a pipe whose entrance is passed to 'f'
++      and whose output is 'ofd' *)
++  val decompress: Unix.file_descr -> (Unix.file_descr -> 'a) -> 'a
++
++  (* Experimental decompressor which is fed from an fd and writes to a pipe *)
++  val decompress_passive: Unix.file_descr -> (Unix.file_descr -> 'a) -> 'a
++end
+diff --git a/compression/jbuild b/compression/jbuild
+new file mode 100644
+index 0000000..05d2240
+--- /dev/null
++++ b/compression/jbuild
+@@ -0,0 +1,9 @@
++(library
++ ((name compression)
++  (public_name compression)
++  (libraries
++   (forkexec
++    threads
++    xapi-stdext-pervasives
++    xapi-stdext-unix))
++ ))
+diff --git a/gzip.opam b/gzip.opam
+index a4d07e9..29a9463 100644
+--- a/gzip.opam
++++ b/gzip.opam
+@@ -10,7 +10,5 @@ build: [[ "jbuilder" "build" "-p" name "-j" jobs ]]
+ available: [ os = "linux" ]
+ depends: [
+   "jbuilder" {build}
+-  "forkexec"
+-  "xapi-stdext-pervasives"
+-  "xapi-stdext-unix"
++  "compression"
+ ]
+diff --git a/gzip/gzip.ml b/gzip/gzip.ml
+index 119c289..be5f24f 100644
+--- a/gzip/gzip.ml
++++ b/gzip/gzip.ml
+@@ -12,87 +12,9 @@
+  * GNU Lesser General Public License for more details.
+  *)
+ 
+-open Xapi_stdext_pervasives.Pervasiveext
++module Gzip = Compression.Make(struct
++  (** Path to the gzip binary *)
++  let executable = "/bin/gzip"
++end)
+ 
+-(** Path to the gzip binary *)
+-let gzip = "/bin/gzip"
+-
+-(** Helper function to prevent double-closes of file descriptors *)
+-let close to_close fd = 
+-  if List.mem fd !to_close then Unix.close fd;
+-  to_close := List.filter (fun x -> fd <> x) !to_close 
+-
+-type zcat_mode = Compress | Decompress
+-
+-type input_type = 
+-  | Active  (** we provide a function which writes into the compressor and a fd output *)
+-  | Passive (** we provide an fd input and a function which reads from the compressor *)
+-
+-(* start cmd with lowest priority so that it doesn't 
+-   use up all cpu resources in dom0 
+-*)
+-let lower_priority cmd args =
+-  let ionice="/usr/bin/ionice" in
+-  let ionice_args=["-c";"3"] in (*io idle*)
+-  let nice="/bin/nice" in
+-  let nice_args=["-n";"19"] in (*lowest priority*)
+-  let extra_args=nice_args@[ionice]@ionice_args in
+-  let new_cmd=nice in
+-  let new_args=extra_args@[cmd]@args in
+-  (new_cmd,new_args)
+-
+-(** Runs a zcat process which is either:
+-    i) a compressor; or (ii) a decompressor
+-    and which has either
+-    i) an active input (ie a function and a pipe) + passive output (fd); or
+-    ii) a passive input (fd) + active output (ie a function and a pipe)
+-*)
+-let go (mode: zcat_mode) (input: input_type) fd f = 
+-  let zcat_out, zcat_in = Unix.pipe() in
+-
+-  let to_close = ref [ zcat_in; zcat_out ] in
+-  let close = close to_close in
+-
+-  finally
+-    (fun () ->
+-       let args = if mode = Compress then [] else ["--decompress"] @ [ "--stdout"; "--force" ] in
+-
+-       let stdin, stdout, close_now, close_later = match input with
+-         | Active -> 
+-           Some zcat_out,                              (* input comes from the pipe+fn *)
+-           Some fd,                                    (* supplied fd is written to *)
+-           zcat_out,                                   (* we close this now *)
+-           zcat_in                                     (* close this before waitpid *)
+-         | Passive -> 
+-           Some fd,                                    (* supplied fd is read from *)
+-           Some zcat_in,                               (* output goes into the pipe+fn *) 
+-           zcat_in,                                    (* we close this now *)
+-           zcat_out in                                 (* close this before waitpid *)
+-       let (gzip,args)=lower_priority gzip args in
+-       let pid = Forkhelpers.safe_close_and_exec stdin stdout None [] gzip args in
+-       close close_now;
+-       finally
+-         (fun () -> 
+-            f close_later
+-         )
+-         (fun () ->
+-            let failwith_error s =
+-              let mode = if mode = Compress then "Compression" else "Decompression" in
+-              let msg = Printf.sprintf "%s via zcat failed: %s" mode s in
+-              Printf.eprintf "%s" msg;
+-              failwith msg
+-            in
+-            close close_later;
+-            let open Xapi_stdext_unix in
+-            match snd (Forkhelpers.waitpid pid) with
+-            | Unix.WEXITED 0 -> ();
+-            | Unix.WEXITED i -> failwith_error (Printf.sprintf "exit code %d" i)
+-            | Unix.WSIGNALED i -> failwith_error (Printf.sprintf "killed by signal: %s" (Unixext.string_of_signal i))
+-            | Unix.WSTOPPED i -> failwith_error (Printf.sprintf "stopped by signal: %s" (Unixext.string_of_signal i))
+-         )
+-    ) (fun () -> List.iter close !to_close)
+-
+-let compress fd f = go Compress Active fd f
+-let decompress fd f = go Decompress Active fd f
+-
+-let decompress_passive fd f = go Decompress Passive fd f
++include Gzip
+diff --git a/gzip/jbuild b/gzip/jbuild
+index 60db7ce..9a90461 100644
+--- a/gzip/jbuild
++++ b/gzip/jbuild
+@@ -2,8 +2,5 @@
+  ((name gzip)
+   (public_name gzip)
+   (libraries
+-   (forkexec
+-    threads
+-    xapi-stdext-pervasives
+-    xapi-stdext-unix))
++   (compression))
+  ))
+
