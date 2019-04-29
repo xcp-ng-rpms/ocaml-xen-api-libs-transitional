@@ -1,23 +1,19 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.7.0
-Release:        1.1%{?dist}
+Version:        2.15.0
+Release:        1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
-Source0:        https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v%{version}&format=tar.gz&prefix=xen-api-libs-transitional-%{version}#/xen-api-libs-transitional-%{version}.tar.gz
 
-# XCP-ng patches
-Patch1000: 0001-Pull-generic-compression-library-out-of-the-Gzip-mod.patch
-Patch1001: 0002-Add-zstd-library.patch
-Patch1002: 0003-compression-Add-function-to-check-whether-a-given-al.patch
-Patch1003: 0004-Rename-generic-compression-library-and-module.patch
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.7.0&format=tar.gz&prefix=xen-api-libs-transitional-2.7.0#/xen-api-libs-transitional-2.7.0.tar.gz) = d7dcb6518f396176bd3ac396537af35929009932
+
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz) = df4c5f7452f90572c5bc325792220e1fcb44acdd
+
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
-BuildRequires:  ocaml-camlp4-devel
 BuildRequires:  xen-devel
 BuildRequires:  xen-dom0-libs-devel
 BuildRequires:  xen-libs-devel
@@ -32,11 +28,11 @@ Requires:       xen-dom0-libs
 A deprecated standard library extension for OCaml.
 
 %package        devel
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz) = df4c5f7452f90572c5bc325792220e1fcb44acdd
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
 Requires:  forkexecd-devel
-Requires:  ocaml-camlp4-devel
 Requires:  xen-devel
 Requires:  xen-dom0-libs-devel
 Requires:  xen-libs-devel
@@ -49,7 +45,7 @@ Requires:  xen-dom0-libs
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-%global ocaml_dir    /usr/lib/opamroot/system
+%global ocaml_dir    /usr/lib/opamroot/ocaml-system
 %global ocaml_libdir %{ocaml_dir}/lib
 %global ocaml_docdir %{ocaml_dir}/doc
 %global build_ocaml_dir %{buildroot}%{ocaml_dir}
@@ -57,15 +53,13 @@ developing applications that use %{name}.
 %global build_ocaml_docdir %{buildroot}%{ocaml_docdir}
 
 %prep
-%autosetup -p1 -n xen-api-libs-transitional-%{version}
+%autosetup -p1
 
 %build
 make
 
 %install
-mkdir -p %{build_ocaml_libdir}
-mkdir -p %{build_ocaml_docdir}
-make install OPAM_PREFIX=%{build_ocaml_dir} OPAM_LIBDIR=%{build_ocaml_libdir}
+make install DESTDIR=%{buildroot}
 
 # this is to make opam happy
 mkdir -p %{build_ocaml_libdir}/xapi-libs-transitional
@@ -126,13 +120,6 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %exclude %{ocaml_libdir}/uuid/*.cmx
 %exclude %{ocaml_libdir}/uuid/*.mli
 
-%{ocaml_libdir}/xapi-compression
-%exclude %{ocaml_libdir}/xapi-compression/*.a
-%exclude %{ocaml_libdir}/xapi-compression/*.cmxa
-%exclude %{ocaml_libdir}/xapi-compression/*.cmxs
-%exclude %{ocaml_libdir}/xapi-compression/*.cmx
-%exclude %{ocaml_libdir}/xapi-compression/*.mli
-
 %{ocaml_libdir}/xenctrlext
 %exclude %{ocaml_libdir}/xenctrlext/*.a
 %exclude %{ocaml_libdir}/xenctrlext/*.cmxa
@@ -155,6 +142,12 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %exclude %{ocaml_libdir}/zstd/*.cmx
 %exclude %{ocaml_libdir}/zstd/*.mli
 
+%{ocaml_libdir}/xapi-compression
+%exclude %{ocaml_libdir}/xapi-compression/*.a
+%exclude %{ocaml_libdir}/xapi-compression/*.cmxa
+%exclude %{ocaml_libdir}/xapi-compression/*.cmxs
+%exclude %{ocaml_libdir}/xapi-compression/*.cmx
+%exclude %{ocaml_libdir}/xapi-compression/*.mli
 
 %files devel
 %{ocaml_libdir}/gzip/*.a
@@ -199,12 +192,6 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/uuid/*.cmx
 %{ocaml_libdir}/uuid/*.mli
 
-%{ocaml_libdir}/xapi-compression/*.a
-%{ocaml_libdir}/xapi-compression/*.cmxa
-%{ocaml_libdir}/xapi-compression/*.cmxs
-%{ocaml_libdir}/xapi-compression/*.cmx
-%{ocaml_libdir}/xapi-compression/*.mli
-
 %{ocaml_libdir}/xenctrlext/*.a
 %{ocaml_libdir}/xenctrlext/*.cmxa
 %{ocaml_libdir}/xenctrlext/*.cmxs
@@ -223,11 +210,43 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/zstd/*.cmx
 %{ocaml_libdir}/zstd/*.mli
 
+%{ocaml_libdir}/xapi-compression/*.a
+%{ocaml_libdir}/xapi-compression/*.cmxa
+%{ocaml_libdir}/xapi-compression/*.cmxs
+%{ocaml_libdir}/xapi-compression/*.cmx
+%{ocaml_libdir}/xapi-compression/*.mli
+
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
-* Tue Jan 22 2019 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.7.0-1.1
-- Add ZSTD support
+* Wed Jan 23 2019 Christian Lindig <christian.lindig@citrix.com> - 2.15.0-1
+- Prepare for Dune 1.6
+
+* Thu Jan 17 2019 Christian Lindig <christian.lindig@citrix.com> - 2.14.0-1
+- Ported last remaining package http-svr to dune.
+
+* Mon Dec 10 2018 Christian Lindig <christian.lindig@citrix.com> - 2.13.0-1
+- Add zstd library
+- Add xapi-compression library
+- Port to Dune
+
+* Thu Nov 01 2018 Christian Lindig <christian.lindig@citrix.com> - 2.12.0-1
+- Update opam files for Opam 2, update Travis setup
+
+* Mon Oct 22 2018 Christian Lindig <christian.lindig@citrix.com> - 2.11.0-1
+- CP-29687: Remove TLS_RSA_WITH_AES_128_CBC_SHA(AES128-SHA) for CC
+- allow_failures cannot be parsed by travis
+
+* Thu Oct 11 2018 Rob Hoes <rob.hoes@citrix.com> - 2.10.0-1
+- CP-29196: Enable FIPS mode if existence of cc preparations (#52)
+- CP-29696: Change the order of cipher base on latest requirement
+
+* Tue Sep 11 2018 Christian Lindig <christian.lindig@citrix.com> - 2.9.0-1
+- CA-296532: mpathalert log spam
+
+* Wed Sep 05 2018 Christian Lindig <christian.lindig@citrix.com> - 2.8.0-1
+- CP-29015: Set correct ciphers for stunnel client
+- Simplify PPX processing
 
 * Wed Jul 18 2018 Christian Lindig <christian.lindig@citrix.com> - 2.7.0-1
 - CA-291012 Added better printing of xml exc
