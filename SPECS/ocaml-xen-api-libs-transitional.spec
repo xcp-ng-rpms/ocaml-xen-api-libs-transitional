@@ -1,16 +1,16 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.15.0
+Version:        2.20.0
 Release:        1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz
 
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz) = df4c5f7452f90572c5bc325792220e1fcb44acdd
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz) = 99acaf9b58a14219d9e0938db421da838145d12a
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -28,7 +28,7 @@ Requires:       xen-dom0-libs
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.15.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.15.0#/xen-api-libs-transitional-2.15.0.tar.gz) = df4c5f7452f90572c5bc325792220e1fcb44acdd
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz) = 99acaf9b58a14219d9e0938db421da838145d12a
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
@@ -45,7 +45,7 @@ Requires:  xen-dom0-libs
 The %{name}-devel package contains libraries and signature files for
 developing applications that use %{name}.
 
-%global ocaml_dir    /usr/lib/opamroot/ocaml-system
+%global ocaml_dir    %{_opamroot}/ocaml-system
 %global ocaml_libdir %{ocaml_dir}/lib
 %global ocaml_docdir %{ocaml_dir}/doc
 %global build_ocaml_dir %{buildroot}%{ocaml_dir}
@@ -57,6 +57,9 @@ developing applications that use %{name}.
 
 %build
 make
+
+%check
+make test
 
 %install
 make install DESTDIR=%{buildroot}
@@ -219,6 +222,28 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Tue Nov 12 2019 Christian Lindig <christian.lindig@citrix.com> - 2.20.0-1
+- CA-329836 Improve logging
+
+* Thu Oct 24 2019 Christian Lindig <christian.lindig@citrix.com> - 2.19.0-1
+- travis: use xs-opam to set ci env
+- opam: add ounit as test dependency
+
+* Fri Aug 23 2019 Edwin Török <edvin.torok@citrix.com> - 2.18.0-2
+- bump packages after xs-opam update
+
+* Mon Aug 12 2019 Christian Lindig <christian.lindig@citrix.com> - 2.18.0-1
+- Remove debug logging about accepting connection
+
+* Wed Aug 07 2019 Christian Lindig <christian.lindig@citrix.com> - 2.17.0-1
+- Mute Dune preprocess warnings
+- Use Debian Unstable for Travis
+- Fix http-svr.opam: use rpclib
+- Travis: use OCAML_VERSION=4.07
+
+* Wed Jun 05 2019 Christian Lindig <christian.lindig@citrix.com> - 2.16.0-1
+- maintenance: remove use of xapi-stdext-base64
+
 * Wed Jan 23 2019 Christian Lindig <christian.lindig@citrix.com> - 2.15.0-1
 - Prepare for Dune 1.6
 
