@@ -1,16 +1,16 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.20.0
+Version:        2.25.0
 Release:        1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz
 
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz) = 99acaf9b58a14219d9e0938db421da838145d12a
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz) = ef8fbf75a76d6076414b8806450f7ca42602f777
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -20,6 +20,7 @@ BuildRequires:  xen-libs-devel
 BuildRequires:  ocaml-xcp-idl-devel
 Requires:       xen-libs
 Requires:       xen-dom0-libs
+Requires:       stunnel >= 5.55
 
 %global _use_internal_dependency_generator 0
 %global __requires_exclude *caml*
@@ -28,7 +29,7 @@ Requires:       xen-dom0-libs
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.20.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.20.0#/xen-api-libs-transitional-2.20.0.tar.gz) = 99acaf9b58a14219d9e0938db421da838145d12a
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz) = ef8fbf75a76d6076414b8806450f7ca42602f777
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
@@ -102,13 +103,6 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %exclude %{ocaml_libdir}/sexpr/*.cmx
 %exclude %{ocaml_libdir}/sexpr/*.mli
 
-%{ocaml_libdir}/sha1
-%exclude %{ocaml_libdir}/sha1/*.a
-%exclude %{ocaml_libdir}/sha1/*.cmxa
-%exclude %{ocaml_libdir}/sha1/*.cmxs
-%exclude %{ocaml_libdir}/sha1/*.cmx
-%exclude %{ocaml_libdir}/sha1/*.mli
-
 %{ocaml_libdir}/stunnel
 %exclude %{ocaml_libdir}/stunnel/*.a
 %exclude %{ocaml_libdir}/stunnel/*.cmxa
@@ -152,6 +146,13 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %exclude %{ocaml_libdir}/xapi-compression/*.cmx
 %exclude %{ocaml_libdir}/xapi-compression/*.mli
 
+%{ocaml_libdir}/safe-resources
+%exclude %{ocaml_libdir}/safe-resources/*.a
+%exclude %{ocaml_libdir}/safe-resources/*.cmxa
+%exclude %{ocaml_libdir}/safe-resources/*.cmxs
+%exclude %{ocaml_libdir}/safe-resources/*.cmx
+%exclude %{ocaml_libdir}/safe-resources/*.mli
+
 %files devel
 %{ocaml_libdir}/gzip/*.a
 %{ocaml_libdir}/gzip/*.cmxa
@@ -176,12 +177,6 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/sexpr/*.cmxs
 %{ocaml_libdir}/sexpr/*.cmx
 %{ocaml_libdir}/sexpr/*.mli
-
-%{ocaml_libdir}/sha1/*.a
-%{ocaml_libdir}/sha1/*.cmxa
-%{ocaml_libdir}/sha1/*.cmxs
-%{ocaml_libdir}/sha1/*.cmx
-%{ocaml_libdir}/sha1/*.mli
 
 %{ocaml_libdir}/stunnel/*.a
 %{ocaml_libdir}/stunnel/*.cmxa
@@ -219,9 +214,50 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-compression/*.cmx
 %{ocaml_libdir}/xapi-compression/*.mli
 
+%{ocaml_libdir}/safe-resources/*.a
+%{ocaml_libdir}/safe-resources/*.cmxa
+%{ocaml_libdir}/safe-resources/*.cmxs
+%{ocaml_libdir}/safe-resources/*.cmx
+%{ocaml_libdir}/safe-resources/*.mli
+
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Mon Jun 01 2020 Christian Lindig <christian.lindig@citrix.com> - 2.25.0-1
+- CA-337546: add a xapi_stdext_resources module for safe handling of
+	file descriptors
+- CA-337546: use Unixfd.t to avoid leaks
+- CA-337546: watchdog: replace pipe with scheduler
+- CA-337546: convert xapi-compression to use safe pipes
+- CA-337546: rename to safe_resources
+- CA-337546: print LOC on GC close failure
+- CA-337546: use Hashtbl.replace in move_into
+- CA-337546: add opam file for new library
+- CA-337546: stunnel disconnect: fix Stack overflow
+- CA-337546: stunnel: don't loop when wait=false in disconnect
+- CA-340493: only call diagnose failure if a logfile exists
+
+* Fri Apr 03 2020 Christian Lindig <christian.lindig@citrix.com> - 2.24.0-1
+- CP-32840 drop legacy ssl support
+- CP-33058 centralize cipherstrings
+
+* Tue Mar 17 2020 Christian Lindig <christian.lindig@citrix.com> - 2.23.0-1
+- CA-336258: http-svr: add JSONRPC_protocol
+- Remove sha1 from travis file
+
+* Mon Feb 24 2020 Christian Lindig <christian.lindig@citrix.com> - 2.22.0-1
+- CP-27904: nuke sha1 out of orbit
+
+* Wed Feb 12 2020 Christian Lindig <christian.lindig@citrix.com> - 2.21.0-1
+- CP-32124: Set fips=yes explicitly
+- CP-32124: Add checkHost verify peer hostname against cert
+- CP-32124: Check if the CRLpath is an empty directory
+- CP-32124: Set the default log facility as 'authpriv'
+- CP-32124: Disable TLSv1.3
+
+* Tue Jan 07 2020 Ming Lu <ming.lu@citrix.com> - 2.20.0-2
+- CP-32124 Add 'Requires: stunnel >= 5.55' for stunnel update
+
 * Tue Nov 12 2019 Christian Lindig <christian.lindig@citrix.com> - 2.20.0-1
 - CA-329836 Improve logging
 
