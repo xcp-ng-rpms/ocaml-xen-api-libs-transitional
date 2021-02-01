@@ -2,7 +2,7 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.3
-Release:        2.1%{?dist}
+Release:        2.1.0.ipv6.1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
@@ -223,6 +223,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Thu Feb 17 2022 Benjamin Reis <benjamin.reis@vates.fr> - 2.25.3-1.1.0.ipv6.1
+- Rebuild for IPv6: for xapi build
+
 * Mon Dec 20 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.3-1.1
 - Sync with CH 8.2.1
 - *** Upstream changelog ***
@@ -344,7 +347,7 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 - http-svr: make again safe-string compliant after last PR
 
 * Tue May 01 2018 Christian Lindig <christian.lindig@citrix.com> - 2.5.0-1
-- http-svr: reintroduce really_write, whose behaviour has been fixed 
+- http-svr: reintroduce really_write, whose behaviour has been fixed
   in xapi-stdext-unix 1.2.0
 
 * Mon Apr 09 2018 Christian Lindig <christian.lindig@citrix.com> - 2.4.0-1
@@ -374,10 +377,10 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 * Thu Jun 23 2016 Jon Ludlam <jonathan.ludlam@citrix.com> - 1.0.0-1
 - Stable release
 
-* Tue Apr 26 2016 Euan Harris <euan.harris@citrix.com> - 0.9.10-1 
+* Tue Apr 26 2016 Euan Harris <euan.harris@citrix.com> - 0.9.10-1
 - Add support for configuring stunnel's cipher suites
 
-* Fri Dec 11 2015 Euan Harris <euan.harris@citrix.com> - 0.9.9-1 
+* Fri Dec 11 2015 Euan Harris <euan.harris@citrix.com> - 0.9.9-1
 - Remove cpuid
 - Remove xen-utils
 
