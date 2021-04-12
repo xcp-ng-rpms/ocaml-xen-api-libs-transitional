@@ -1,0 +1,26 @@
+Use HTTP/1.1 instead of /1.0 in 101 responses to respect the spec.
+https://tools.ietf.org/html/rfc6455
+
+diff --git c/http-svr/ws_helpers.ml w/http-svr/ws_helpers.ml
+index 3e912a9..24397b3 100644
+--- c/http-svr/ws_helpers.ml
++++ w/http-svr/ws_helpers.ml
+@@ -37,7 +37,7 @@
+     | Some x -> [ Printf.sprintf "Sec-WebSocket-Protocol: %s" x ]
+     | None -> []
+   in
+-  [ "HTTP/1.0 101 WebSocket Protocol Handshake";
++  [ "HTTP/1.1 101 WebSocket Protocol Handshake";
+     "Upgrade: WebSocket";
+     "Connection: Upgrade";
+     Printf.sprintf "Sec-WebSocket-Origin: %s" origin;
+@@ -46,7 +46,7 @@
+
+
+ let http_101_websocket_upgrade_15 key  =
+-  [ "HTTP/1.0 101 Switching Protocols";
++  [ "HTTP/1.1 101 Switching Protocols";
+     "Upgrade: websocket";
+     "Connection: Upgrade";
+     Printf.sprintf "Sec-WebSocket-Accept: %s" key;
+
