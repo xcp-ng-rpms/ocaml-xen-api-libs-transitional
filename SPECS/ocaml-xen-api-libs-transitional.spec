@@ -2,7 +2,7 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.0
-Release:        1.1%{?dist}
+Release:        1.2%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
@@ -11,6 +11,9 @@ Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api
 
 
 Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz) = ef8fbf75a76d6076414b8806450f7ca42602f777
+
+# XCP-ng patch
+Patch1000: ocaml-xen-api-libs-transitional-2.25.0-use-http1.1-101-response.patch
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -223,6 +226,10 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Mon Apr 12 2021 Benjamin Reis <benjamin.reis@vates.fr> - 2.25.0-1.2
+- Add: ocaml-xen-api-libs-transitional-2.25.0-use-http1.1-101-response.patch
+- Use HTTP 1.1 protocol in 101 responses
+
 * Thu Nov 05 2020 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.0-1.1
 - Rebuild for xs-opam-src 6.35.1 from XS82E002
 
