@@ -1,16 +1,16 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.25.0
+Version:        2.25.1
 Release:        1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz
 
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz) = ef8fbf75a76d6076414b8806450f7ca42602f777
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz) = feaa0f87d80d11576b1d6c9be792544e7612eb0b
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -29,7 +29,7 @@ Requires:       stunnel >= 5.55
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.0&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.0#/xen-api-libs-transitional-2.25.0.tar.gz) = ef8fbf75a76d6076414b8806450f7ca42602f777
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz) = feaa0f87d80d11576b1d6c9be792544e7612eb0b
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
@@ -223,6 +223,12 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Thu Feb 11 2021 Ben Anson <ben.anson@citrix.com> - 2.25.1-1
+- CP-35026 add ability to parse a PROXY header
+- CP-35026 add STUNNEL_PROXY additional header
+- CA-342856 don't print to stderr, use Debug.error
+- fixup! CA-342856 don't print to stderr, use Debug.error
+
 * Mon Jun 01 2020 Christian Lindig <christian.lindig@citrix.com> - 2.25.0-1
 - CA-337546: add a xapi_stdext_resources module for safe handling of
 	file descriptors
