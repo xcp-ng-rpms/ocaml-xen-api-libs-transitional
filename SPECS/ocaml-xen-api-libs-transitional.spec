@@ -1,16 +1,16 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.25.1
+Version:        2.25.2
 Release:        1.1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz
 
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz) = feaa0f87d80d11576b1d6c9be792544e7612eb0b
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz) = d84f17de7fdc1e5d7ccbd7873507814b3f82fee8
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -29,7 +29,7 @@ Requires:       stunnel >= 5.55
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.1&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.1#/xen-api-libs-transitional-2.25.1.tar.gz) = feaa0f87d80d11576b1d6c9be792544e7612eb0b
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz) = d84f17de7fdc1e5d7ccbd7873507814b3f82fee8
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
@@ -223,6 +223,13 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Wed Sep 01 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.2-1.1
+- Sync with hotfix XS82E031
+- *** Upstream changelog ***
+- * Fri Jul 16 2021 Ben Anson <ben.anson@citrix.com> - 2.25.2-1
+- - CP-36872: Backport XSI-989
+- - Use HTTP/1.1 in 101 response
+
 * Tue May 18 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.1-1.1
 - Update for XS82E020
 - *** Upstream changelog ***
