@@ -2,13 +2,15 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.2
-Release:        1.1%{?dist}
+Release:        1.1.0.fixproxy.1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
 Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz
 
+# XCP-ng patches
+Patch1000: ocaml-xen-api-libs-transitional-2.25.2-fix-proxy-metadata-to-multiple-https-requests-on-a-connection.backport.patch
 
 Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz) = d84f17de7fdc1e5d7ccbd7873507814b3f82fee8
 
@@ -223,6 +225,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Fri Sep 10 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.2-1.1.0.fixproxy.1
+- Add upstream patch to fix bogus HTTP 403 errors
+
 * Wed Sep 01 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.2-1.1
 - Sync with hotfix XS82E031
 - *** Upstream changelog ***
