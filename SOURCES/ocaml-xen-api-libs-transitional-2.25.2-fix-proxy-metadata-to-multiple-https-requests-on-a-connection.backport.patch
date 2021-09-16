@@ -1,5 +1,5 @@
-From a11d38b1d12f4f2e092d08e4f1579ad413556f7a Mon Sep 17 00:00:00 2001
-From: Rob Hoes <rob.hoes@citrix.com>
+From 26802fe1acacfcf78502e437328ee4bbc7c6a87e Mon Sep 17 00:00:00 2001
+From: Samuel Verschelde <stormi-xcp@ylix.fr>
 Date: Thu, 9 Sep 2021 16:28:20 +0000
 Subject: [PATCH] CA-358583: Fix PROXY metadata to multiple HTTPS requests on a
  connection
@@ -19,45 +19,36 @@ not. It doesn't remember that it had already seen the PROXY header. This
 is easily fixed in the receive loop by passing on a PROXY header once
 one has been seen.
 
-Signed-off-by: Rob Hoes <rob.hoes@citrix.com>
+Backported from commit 4b14f357ac4a39e224a48e07053e11915b9dc44d, that
+was originally written by Rob Hoes <rob.hoes@citrix.com>.
 
-[Cherry-picked, with conflicts solved]
+Several conflicts solved, due to formatting changes and refactoring.
+
+Signed-off-by: Samuel Verschelde <stormi-xcp@ylix.fr>
 ---
- http-svr/http_proxy.ml |  14 ++--
- http-svr/http_svr.ml   | 172 ++++++++++++++++++++++++-----------------
+ http-svr/http_proxy.ml |   2 +-
+ http-svr/http_svr.ml   | 162 +++++++++++++++++++++++------------------
  http-svr/http_svr.mli  |   7 +-
- 3 files changed, 111 insertions(+), 82 deletions(-)
+ 3 files changed, 99 insertions(+), 72 deletions(-)
 
 diff --git a/http-svr/http_proxy.ml b/http-svr/http_proxy.ml
-index fd4af3e..c9be65b 100644
+index fd4af3e..a757df6 100644
 --- a/http-svr/http_proxy.ml
 +++ b/http-svr/http_proxy.ml
-@@ -54,13 +54,13 @@ let http_proxy src_ip src_port transport =
-     (* NB 'fromfd' is accepted within the server_io module and it expects us to close it *)
+@@ -55,7 +55,7 @@ let http_proxy src_ip src_port transport =
      finally
        (fun () ->
--         let bio = Buf_io.of_fd fromfd in
+          let bio = Buf_io.of_fd fromfd in
 -         let request = Http_svr.request_of_bio bio in
--         Opt.iter
--           (fun request ->
--              with_transport transport (one request fromfd)
--           ) request;
--      ) (fun () -> Unix.close fromfd)
-+        let bio = Buf_io.of_fd fromfd in
-+        let request, _ = Http_svr.request_of_bio bio in
-+        Opt.iter
-+          (fun request -> with_transport transport (one request fromfd))
-+          request
-+        )
-+      (fun () -> Unix.close fromfd)
-   in
-   try
-     let addr = Unix.inet_addr_of_string src_ip in
++         let request, _ = Http_svr.request_of_bio bio in
+          Opt.iter
+            (fun request ->
+               with_transport transport (one request fromfd)
 diff --git a/http-svr/http_svr.ml b/http-svr/http_svr.ml
-index ab07893..9c9ec0f 100644
+index ab07893..8356caa 100644
 --- a/http-svr/http_svr.ml
 +++ b/http-svr/http_svr.ml
-@@ -328,79 +328,94 @@ let request_of_bio_exn_slow ic =
+@@ -328,79 +328,92 @@ let request_of_bio_exn_slow ic =
        else (k, v) :: (read_rest_of_headers (left - 1))
      | None -> [] in
    let headers = read_rest_of_headers 242 in
@@ -96,12 +87,9 @@ index ab07893..9c9ec0f 100644
 +let request_of_bio_exn ~proxy_seen bio =
    let fd = Buf_io.fd_of bio in
 -  let frame, headers, proxy = Http.read_http_request_header fd in
--  let additional_headers = proxy |> Option.fold ~none:[] ~some:(fun p -> [("STUNNEL_PROXY", p)]) in
 +  let frame, headers, proxy' = Http.read_http_request_header fd in
 +  let proxy = match proxy' with None -> proxy_seen | x -> x in
-+  let additional_headers =
-+    proxy |> Option.fold ~none:[] ~some:(fun p -> [("STUNNEL_PROXY", p)]) 
-+  in
+   let additional_headers = proxy |> Option.fold ~none:[] ~some:(fun p -> [("STUNNEL_PROXY", p)]) in
    let open Http.Request in
 -  Astring.String.cuts ~sep:"\n" headers |> List.fold_left
 -        (fun (status, req) header ->
@@ -192,7 +180,7 @@ index ab07893..9c9ec0f 100644
  (** [request_of_bio ic] returns [Some req] read from [ic], or [None]. If [None] it will have
      	already sent back a suitable error code and response to the client. *)
 -let request_of_bio ?(use_fastpath=false) ic =
-+let request_of_bio ?(use_fastpath = false) ?proxy_seen ic =
++let request_of_bio ?(use_fastpath=false) ?proxy_seen ic =
    try
 -    let r = (if use_fastpath then request_of_bio_exn else request_of_bio_exn_slow) ic in
 -(*
@@ -213,22 +201,16 @@ index ab07893..9c9ec0f 100644
    with e ->
      D.warn "%s (%s)" (Printexc.to_string e) __LOC__;
      best_effort (fun () ->
-@@ -425,10 +440,10 @@ let request_of_bio ?(use_fastpath=false) ic =
-         | Unix.Unix_error (a,b,c) ->
-           response_internal_error ss ~extra:(Printf.sprintf "Got UNIX error: %s %s %s" (Unix.error_message a) b c)
-         | exc ->
--          response_internal_error ss ~extra:(escape (Printexc.to_string exc));
--          log_backtrace ();
--      );
+@@ -428,7 +441,7 @@ let request_of_bio ?(use_fastpath=false) ic =
+           response_internal_error ss ~extra:(escape (Printexc.to_string exc));
+           log_backtrace ();
+       );
 -    None
-+            response_internal_error ss ~extra:(escape (Printexc.to_string exc)) ;
-+            log_backtrace ()
-+    ) ;
 +    (None, None)
  
  let handle_one (x: 'a Server.t) ss context req =
    let ic = Buf_io.of_fd ss in
-@@ -473,16 +488,27 @@ let handle_one (x: 'a Server.t) ss context req =
+@@ -473,16 +486,27 @@ let handle_one (x: 'a Server.t) ss context req =
  
  let handle_connection (x: 'a Server.t) _ ss =
    let ic = Buf_io.of_fd ss in
