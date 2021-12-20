@@ -1,16 +1,16 @@
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.25.2
-Release:        1.1%{?dist}
+Version:        2.25.3
+Release:        2.1%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz
+Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz
 
 
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz) = d84f17de7fdc1e5d7ccbd7873507814b3f82fee8
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
 
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
@@ -29,7 +29,7 @@ Requires:       stunnel >= 5.55
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.2&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.2#/xen-api-libs-transitional-2.25.2.tar.gz) = d84f17de7fdc1e5d7ccbd7873507814b3f82fee8
+Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
@@ -223,6 +223,14 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Mon Dec 20 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.3-1.1
+- Sync with CH 8.2.1
+- *** Upstream changelog ***
+- * Mon Sep 27 2021 Pau Ruiz Safont <pau.safont@citrix.com> - 2.25.3-2
+- - Bump package after xs-opam update
+- * Thu Sep 23 2021 Pau Ruiz Safont <pau.safont@citrix.com> - 2.25.3-1
+- - CA-358583: Fix PROXY metadata to multiple HTTPS requests on a connection
+
 * Wed Sep 01 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.2-1.1
 - Sync with hotfix XS82E031
 - *** Upstream changelog ***
