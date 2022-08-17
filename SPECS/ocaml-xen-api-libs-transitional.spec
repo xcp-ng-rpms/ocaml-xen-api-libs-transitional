@@ -2,7 +2,7 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.3
-Release:        2.1%{?dist}
+Release:        2.2%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
@@ -223,6 +223,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Wed Aug 17 2022 Gael Duperrey <gduperrey@vates.fr> - 2.25.3-1.2
+- Rebuild for updated xapi from XS82ECU1011
+
 * Mon Dec 20 2021 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.3-1.1
 - Sync with CH 8.2.1
 - *** Upstream changelog ***
