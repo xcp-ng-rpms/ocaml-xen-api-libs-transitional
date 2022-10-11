@@ -2,12 +2,21 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
 
 Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz
+Patch1: SOURCES/ocaml-xen-api-libs-transitional/0001-Use-ocaml-format.patch
+Patch2: SOURCES/ocaml-xen-api-libs-transitional/0002-Add-newline-before-ambiguous-docstring.patch
+Patch3: SOURCES/ocaml-xen-api-libs-transitional/0003-Reformat.patch
+Patch4: SOURCES/ocaml-xen-api-libs-transitional/0004-Remove-unused-Http_proxy.http_proxy.patch
+Patch5: SOURCES/ocaml-xen-api-libs-transitional/0005-http-svr-remove-slow-path.patch
+Patch6: SOURCES/ocaml-xen-api-libs-transitional/0006-Limit-concurrent-connections-with-semaphore.patch
+Patch7: SOURCES/ocaml-xen-api-libs-transitional/0007-Receive-timeout-for-TCP-connections-when-first-readi.patch
+Patch8: SOURCES/ocaml-xen-api-libs-transitional/0008-Total-timeout-for-receiving-HTTP-headers.patch
+Patch9: SOURCES/ocaml-xen-api-libs-transitional/0009-Maximum-header-length.patch
 
 
 Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
@@ -21,6 +30,7 @@ BuildRequires:  ocaml-xcp-idl-devel
 Requires:       xen-libs
 Requires:       xen-dom0-libs
 Requires:       stunnel >= 5.55
+
 
 %global _use_internal_dependency_generator 0
 %global __requires_exclude *caml*
@@ -223,6 +233,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Thu Sep 08 2022 Rob Hoes <rob.hoes@citrix.com> - 2.25.3-3
+- CA-368579: Mitigations against DoS attacks by unauthenticated clients
+
 * Mon Sep 27 2021 Pau Ruiz Safont <pau.safont@citrix.com> - 2.25.3-2
 - Bump package after xs-opam update
 
