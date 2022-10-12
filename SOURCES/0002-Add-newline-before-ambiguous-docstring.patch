@@ -1,0 +1,25 @@
+From 9b3f5ede58373757b4ef79be4d810e63a958c253 Mon Sep 17 00:00:00 2001
+From: Rob Hoes <rob.hoes@citrix.com>
+Date: Wed, 17 Aug 2022 14:43:16 +0000
+Subject: [PATCH 2/9] Add newline before ambiguous docstring
+
+Signed-off-by: Rob Hoes <rob.hoes@citrix.com>
+---
+ http-svr/http_svr.ml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/http-svr/http_svr.ml b/http-svr/http_svr.ml
+index 8356caa92..c91606bbf 100644
+--- a/http-svr/http_svr.ml
++++ b/http-svr/http_svr.ml
+@@ -397,6 +397,7 @@ let request_of_bio_exn ~proxy_seen bio =
+           ) (false, { empty with Http.Request.frame = frame ; additional_headers }) |> snd
+   in
+   (request, proxy)
++
+ (** [request_of_bio ic] returns [Some req] read from [ic], or [None]. If [None] it will have
+     	already sent back a suitable error code and response to the client. *)
+ let request_of_bio ?(use_fastpath=false) ?proxy_seen ic =
+-- 
+2.31.1
+
