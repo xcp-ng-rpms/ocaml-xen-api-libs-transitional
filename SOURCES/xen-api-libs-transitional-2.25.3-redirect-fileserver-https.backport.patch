@@ -1,0 +1,59 @@
+diff --git i/http-svr/http.ml w/http-svr/http.ml
+index 94f048a..d7c893f 100644
+--- i/http-svr/http.ml
++++ w/http-svr/http.ml
+@@ -119,6 +119,8 @@ module Hdr = struct
+   let content_disposition = "content-disposition"
+
+   let accept = "accept"
++
++  let location = "location"
+ end
+
+ let output_http fd headers =
+diff --git i/http-svr/http.mli w/http-svr/http.mli
+index 72d0266..a5976a1 100644
+--- i/http-svr/http.mli
++++ w/http-svr/http.mli
+@@ -217,6 +217,8 @@ module Hdr : sig
+   val content_disposition : string
+
+   val accept : string
++
++  val location : string
+ end
+
+ val output_http : Unix.file_descr -> string list -> unit
+diff --git i/http-svr/http_svr.ml w/http-svr/http_svr.ml
+index 14809b5..11fd7e9 100644
+--- i/http-svr/http_svr.ml
++++ w/http-svr/http_svr.ml
+@@ -197,6 +197,15 @@ let response_method_not_implemented ?req s =
+   in
+   response_error_html ?version s "501" "Method not implemented" [] body
+
++let response_redirect ?req s dest =
++  let version = Option.fold ~none:"1.1" ~some:get_return_version req in
++  let location = (Http.Hdr.location, dest) in
++  let res =
++    Http.Response.make ~version ~headers:[location] ~body:"" "301"
++      "Moved Permanently"
++  in
++  Unixext.really_write_string s (Http.Response.to_wire_string res)
++
+ let response_file ?mime_content_type s file =
+   let size = (Unix.LargeFile.stat file).Unix.LargeFile.st_size in
+   let mime_header =
+diff --git i/http-svr/http_svr.mli w/http-svr/http_svr.mli
+index 8996e02..563695e 100644
+--- i/http-svr/http_svr.mli
++++ w/http-svr/http_svr.mli
+@@ -117,6 +117,8 @@ val response_internal_error :
+ val response_method_not_implemented :
+   ?req:Http.Request.t -> Unix.file_descr -> unit
+
++val response_redirect : ?req:Http.Request.t -> Unix.file_descr -> string -> unit
++
+ val response_file :
+   ?mime_content_type:string -> Unix.file_descr -> string -> unit
+

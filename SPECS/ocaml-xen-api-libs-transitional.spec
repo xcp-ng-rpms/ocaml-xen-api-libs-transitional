@@ -2,7 +2,7 @@
 
 Name:           ocaml-xen-api-libs-transitional
 Version:        2.25.3
-Release:        3.1%{?dist}
+Release:        3.2%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL2.1 + OCaml linking exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
@@ -17,6 +17,9 @@ Patch6: SOURCES/ocaml-xen-api-libs-transitional/0006-Limit-concurrent-connection
 Patch7: SOURCES/ocaml-xen-api-libs-transitional/0007-Receive-timeout-for-TCP-connections-when-first-readi.patch
 Patch8: SOURCES/ocaml-xen-api-libs-transitional/0008-Total-timeout-for-receiving-HTTP-headers.patch
 Patch9: SOURCES/ocaml-xen-api-libs-transitional/0009-Maximum-header-length.patch
+
+# XCP-ng
+Patch1000: SOURCES/ocaml-xen-api-libs-transitional/xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
 
 
 Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
@@ -233,6 +236,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Thu Dec 01 2022 Benjamin Reis <benjamin.reis@vates.fr> - 2.25.3-3.2
+- Add xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
+
 * Wed Oct 12 2022 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.3-3.1
 - Security update, synced from XS82ECU1019
 - *** Upstream changelog ***
