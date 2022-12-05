@@ -19,7 +19,7 @@ Patch8: SOURCES/ocaml-xen-api-libs-transitional/0008-Total-timeout-for-receiving
 Patch9: SOURCES/ocaml-xen-api-libs-transitional/0009-Maximum-header-length.patch
 
 # XCP-ng
-Patch1000: SOURCES/ocaml-xen-api-libs-transitional/xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
+Patch1000: xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
 
 
 Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
