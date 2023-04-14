@@ -1,58 +1,33 @@
+%global package_speccommit 2dfa0088369ae3dd1e2a0bb5522b0b3a82506366
+%global package_srccommit v2.25.4
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version:        2.25.3
-Release:        3.2%{?dist}
+Version: 2.25.4
+Release: 2.1%{?xsrel}%{?dist}
 Summary:        Deprecated standard library extension for OCaml
-License:        LGPL2.1 + OCaml linking exception
+License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
-
-Source0: https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz
-Patch1: SOURCES/ocaml-xen-api-libs-transitional/0001-Use-ocaml-format.patch
-Patch2: SOURCES/ocaml-xen-api-libs-transitional/0002-Add-newline-before-ambiguous-docstring.patch
-Patch3: SOURCES/ocaml-xen-api-libs-transitional/0003-Reformat.patch
-Patch4: SOURCES/ocaml-xen-api-libs-transitional/0004-Remove-unused-Http_proxy.http_proxy.patch
-Patch5: SOURCES/ocaml-xen-api-libs-transitional/0005-http-svr-remove-slow-path.patch
-Patch6: SOURCES/ocaml-xen-api-libs-transitional/0006-Limit-concurrent-connections-with-semaphore.patch
-Patch7: SOURCES/ocaml-xen-api-libs-transitional/0007-Receive-timeout-for-TCP-connections-when-first-readi.patch
-Patch8: SOURCES/ocaml-xen-api-libs-transitional/0008-Total-timeout-for-receiving-HTTP-headers.patch
-Patch9: SOURCES/ocaml-xen-api-libs-transitional/0009-Maximum-header-length.patch
-
-# XCP-ng
-Patch1000: xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
-
-
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
-
+Source0: xen-api-libs-transitional-2.25.4.tar.gz
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
-BuildRequires:  xen-devel
-BuildRequires:  xen-dom0-libs-devel
-BuildRequires:  xen-libs-devel
+BuildRequires:  xen-ocaml-devel
 BuildRequires:  ocaml-xcp-idl-devel
-Requires:       xen-libs
-Requires:       xen-dom0-libs
 Requires:       stunnel >= 5.55
 
-
-%global _use_internal_dependency_generator 0
-%global __requires_exclude *caml*
+# XCP-ng patches
+Patch1000: xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
 
 %description
 A deprecated standard library extension for OCaml.
 
 %package        devel
-Provides: gitsha(https://code.citrite.net/rest/archive/latest/projects/XSU/repos/xen-api-libs-transitional/archive?at=v2.25.3&format=tar.gz&prefix=ocaml-xen-api-libs-transitional-2.25.3#/xen-api-libs-transitional-2.25.3.tar.gz) = a1b06d28038122b299d9d17928ae0d1e1d307b65
 Summary:        Development files for %{name}
 Requires:       %{name} = %{version}-%{release}
 Requires:  xs-opam-repo
 Requires:  forkexecd-devel
-Requires:  xen-devel
-Requires:  xen-dom0-libs-devel
-Requires:  xen-libs-devel
+Requires:  xen-ocaml-devel
 Requires:  ocaml-xcp-idl-devel
-Requires:  xen-libs
-Requires:  xen-dom0-libs
 
 
 %description    devel
@@ -236,6 +211,9 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Fri Apr 14 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.4-2.1
+- Rebase on hotfix XS82ECU1027
+
 * Thu Dec 01 2022 Benjamin Reis <benjamin.reis@vates.fr> - 2.25.3-3.2
 - Add xen-api-libs-transitional-2.25.3-redirect-fileserver-https.backport.patch
 
@@ -277,7 +255,7 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 
 * Mon Jun 01 2020 Christian Lindig <christian.lindig@citrix.com> - 2.25.0-1
 - CA-337546: add a xapi_stdext_resources module for safe handling of
-	file descriptors
+    file descriptors
 - CA-337546: use Unixfd.t to avoid leaks
 - CA-337546: watchdog: replace pipe with scheduler
 - CA-337546: convert xapi-compression to use safe pipes
@@ -369,7 +347,7 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 - http-svr: make again safe-string compliant after last PR
 
 * Tue May 01 2018 Christian Lindig <christian.lindig@citrix.com> - 2.5.0-1
-- http-svr: reintroduce really_write, whose behaviour has been fixed 
+- http-svr: reintroduce really_write, whose behaviour has been fixed
   in xapi-stdext-unix 1.2.0
 
 * Mon Apr 09 2018 Christian Lindig <christian.lindig@citrix.com> - 2.4.0-1
@@ -399,10 +377,10 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 * Thu Jun 23 2016 Jon Ludlam <jonathan.ludlam@citrix.com> - 1.0.0-1
 - Stable release
 
-* Tue Apr 26 2016 Euan Harris <euan.harris@citrix.com> - 0.9.10-1 
+* Tue Apr 26 2016 Euan Harris <euan.harris@citrix.com> - 0.9.10-1
 - Add support for configuring stunnel's cipher suites
 
-* Fri Dec 11 2015 Euan Harris <euan.harris@citrix.com> - 0.9.9-1 
+* Fri Dec 11 2015 Euan Harris <euan.harris@citrix.com> - 0.9.9-1
 - Remove cpuid
 - Remove xen-utils
 
