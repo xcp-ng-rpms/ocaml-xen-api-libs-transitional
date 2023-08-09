@@ -1,14 +1,14 @@
-%global package_speccommit 2dfa0088369ae3dd1e2a0bb5522b0b3a82506366
-%global package_srccommit v2.25.4
+%global package_speccommit afb3ad17e9f4f6755e8c238c1fc107e33913b34e
+%global package_srccommit v2.25.5
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version: 2.25.4
-Release: 2.1%{?xsrel}%{?dist}
+Version: 2.25.5
+Release: 4.1%{?xsrel}%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
-Source0: xen-api-libs-transitional-2.25.4.tar.gz
+Source0: xen-api-libs-transitional-2.25.5.tar.gz
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
 BuildRequires:  xen-ocaml-devel
@@ -211,6 +211,20 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Wed Aug 09 2023 Gael Duperrey <gduperrey@vates.fr> - 2.25.5-4.1
+- Sync with hotfix XS82ECU1040
+- *** Upstream changelog ***
+- * Thu Jul 20 2023 Rob Hoes <rob.hoes@citrix.com> - 2.25.5-4
+- - Bump release and rebuild
+- * Mon Jun 19 2023 Christian Lindig <christian.lindig@citrix.com> - 2.25.5-3
+- - Bump release and rebuild
+- * Thu Jun 08 2023 Christian Lindig <christian.lindig@citrix.com> - 2.25.5-2
+- - Bump release and rebuild
+- * Mon May 15 2023 Christian Lindig <christian.lindig@citrix.com> - 2.25.5-1
+- - CP-41796 Close Port 80 (Encrypt Data Transfer During VM Migrations)
+- * Fri May 12 2023 Christian Lindig <christian.lindig@citrix.com> - 2.25.4-3
+- - Bump release and rebuild
+
 * Fri Apr 14 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.4-2.1
 - Rebase on hotfix XS82ECU1027
 
