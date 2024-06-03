@@ -1,14 +1,14 @@
-%global package_speccommit a127f1e1c444f12762b03d7e85da8995443f2424
-%global package_srccommit v2.25.5
+%global package_speccommit 3e80302f9d4c74ecc0be66d66dc8d77c789c90b9
+%global package_srccommit v2.25.6
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version: 2.25.5
-Release: 5.1%{?xsrel}%{?dist}
+Version: 2.25.6
+Release: 7.1%{?xsrel}%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
-Source0: xen-api-libs-transitional-2.25.5.tar.gz
+Source0: xen-api-libs-transitional-2.25.6.tar.gz
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
 BuildRequires:  xen-ocaml-devel
@@ -211,6 +211,24 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Mon Jun 03 2024 Gael Duperrey <gduperrey@vates.tech> - 2.25.6-7.1
+- Sync with hotfix XS82ECU1064
+- *** Upstream changelog ***
+- * Fri Mar 08 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-7
+- - Bump release and rebuild
+- * Wed Mar 06 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-6
+- - Bump release and rebuild
+- * Tue Mar 05 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-5
+- - Bump release and rebuild
+- * Fri Nov 03 2023 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-4
+- - Bump release and rebuild
+- * Tue Oct 24 2023 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-3
+- - Bump release and rebuild
+- * Tue Oct 24 2023 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-2
+- - Bump release and rebuild
+- * Wed Oct 18 2023 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-1
+- - CA-379173 handle race condition in stunnel_cache
+
 * Fri Oct 13 2023 Samuel Verschelde <stormi-xcp@ylix.fr> - 2.25.5-5.1
 - Rebuild after sync with hotfix XS82ECU1049
 - No source changes: only rebuild for dependencies
