@@ -1,14 +1,14 @@
-%global package_speccommit 3e80302f9d4c74ecc0be66d66dc8d77c789c90b9
-%global package_srccommit v2.25.6
+%global package_speccommit e489e97b1a4ac41444e5b6671350717d75ad9178
+%global package_srccommit v2.25.7
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
-Version: 2.25.6
-Release: 7.1%{?xsrel}%{?dist}
+Version: 2.25.7
+Release: 1.1%{?xsrel}%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
-Source0: xen-api-libs-transitional-2.25.6.tar.gz
+Source0: xen-api-libs-transitional-2.25.7.tar.gz
 BuildRequires:  xs-opam-repo
 BuildRequires:  forkexecd-devel
 BuildRequires:  xen-ocaml-devel
@@ -211,6 +211,14 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Thu Oct 24 2024 Gael Duperrey <gduperrey@vates.tech> - 2.25.7-1.1
+- Rebuild after sync with hotfix XS82ECU1074
+- *** Upstream changelog ***
+- * Thu Aug 29 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.7-1
+- - CA-395174: Try to unarchive VM's metrics when they aren't running
+- * Wed Jun 19 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.6-8
+- - Bump release and rebuild
+
 * Mon Jun 03 2024 Gael Duperrey <gduperrey@vates.tech> - 2.25.6-7.1
 - Sync with hotfix XS82ECU1064
 - *** Upstream changelog ***
