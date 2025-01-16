@@ -1,10 +1,10 @@
-%global package_speccommit e489e97b1a4ac41444e5b6671350717d75ad9178
+%global package_speccommit 1b7d56640551bdced2e6f31be7eb0ddc60086b28
 %global package_srccommit v2.25.7
 %global debug_package %{nil}
 
 Name:           ocaml-xen-api-libs-transitional
 Version: 2.25.7
-Release: 1%{?xsrel}%{?dist}
+Release: 4%{?xsrel}%{?dist}
 Summary:        Deprecated standard library extension for OCaml
 License:        LGPL-2.1-or-later WITH OCaml-LGPL-linking-exception
 URL:            https://github.com/xapi-project/xen-api-libs-transitional
@@ -208,6 +208,15 @@ touch %{build_ocaml_libdir}/xapi-libs-transitional/opam.config
 %{ocaml_libdir}/xapi-libs-transitional
 
 %changelog
+* Fri Dec 13 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.7-4
+- Bump release and rebuild
+
+* Thu Dec 12 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.7-3
+- Bump release and rebuild
+
+* Mon Dec 09 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.7-2
+- Bump release and rebuild
+
 * Thu Aug 29 2024 Christian Lindig <christian.lindig@cloud.com> - 2.25.7-1
 - CA-395174: Try to unarchive VM's metrics when they aren't running
 
